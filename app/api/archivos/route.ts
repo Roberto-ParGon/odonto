@@ -82,7 +82,7 @@ export async function POST(req: Request) {
             size: file.size,
             url,
             tag: tag || null,
-            uploadDate: new Date().toISOString(),
+            uploadDate: new Date().toISOString().slice(0, 19).replace('T', ' '),
             patientId,
             description: description || null
         }
