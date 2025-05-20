@@ -72,9 +72,7 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
   // Eliminar archivo a través de la API
   const deleteFileItem = async (fileId: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/archivos?id=${fileId}&patientId=${patientId}`, {
-        method: 'DELETE'
-      })
+      const response = await fetch(`/api/archivos?id=${fileId}&patientId=${patientId}`, { method: 'DELETE' })
       if (!response.ok) throw new Error("Error al eliminar archivo")
     } catch (error) {
       console.error("Error deleting file:", error)

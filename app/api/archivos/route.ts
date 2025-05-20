@@ -139,8 +139,17 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: "Archivo no encontrado" }, { status: 404 })
         }
 
-        // Aquí deberías implementar la lógica para eliminar el archivo del almacenamiento
-        // await deleteFileFromStorage(files[0].url)
+        // Eliminar el archivo físico del almacenamiento
+        const fileUrl = files[0].url // Ejemplo: /archivos/imagen.png
+        if (fileUrl) {
+            const filePath = path.join(process.cwd(), "public", fileUrl)
+            try {
+                await fs.unlink(filePath)
+            } catch (err) {
+                // Si el archivo no existe, solo loguea el error pero no detiene el flujo
+                console.warn("No se pudo eliminar el archivo físico:", err)
+            }
+        }
 
         // Eliminar el registro de la base de datos
         await db.query(

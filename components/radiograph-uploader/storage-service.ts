@@ -32,7 +32,7 @@ export async function saveFileItem(file: any) {
 
 // Eliminar archivo
 export async function deleteFileItem(patientId: string, fileId: string) {
-  const res = await fetch(`/api/archivos?patientId=${patientId}&id=${fileId}`, {
+  const res = await fetch(`/api/archivos?id=${fileId}&patientId=${patientId}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Error al eliminar archivo");
