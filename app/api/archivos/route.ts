@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import path from "path"
+import { promises as fs } from "fs"
 
 // Tipos permitidos
 const ALLOWED_MIME_TYPES = [
@@ -61,24 +63,24 @@ export async function POST(req: Request) {
             )
         }
 
-        if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-            return NextResponse.json(
-                { error: "Tipo de archivo no permitido" },
-                { status: 400 }
-            )
-        }
 
-        // Aquí deberías implementar la lógica para subir el archivo a tu almacenamiento
-        // (AWS S3, Google Cloud Storage, etc.) y obtener la URL
-        // const uploadResult = await uploadFileToStorage(file)
 
-        // Ejemplo de respuesta simulada
+        // Guardar archivo en /public/archivos
+        const arrayBuffer = await file.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+        const fileName = `${Date.now()}_${file.name.replace(/\s/g, "_")}`
+        const filePath = path.join(process.cwd(), "public", "archivos", fileName)
+        await fs.writeFile(filePath, buffer)
+
+        // URL local
+        const url = `/archivos/${fileName}`
+
         const fileData = {
             id: crypto.randomUUID(),
             name: file.name,
             type: file.type,
             size: file.size,
-            url: `https://storage.example.com/files/${file.name}`,
+            url,
             tag: tag || null,
             uploadDate: new Date().toISOString(),
             patientId,
@@ -88,9 +90,8 @@ export async function POST(req: Request) {
         // Guardar metadatos en la base de datos
         await db.query(
             `INSERT INTO archivos 
-        (id, name, type, size, url, tag, uploadDate, patientId, description) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-
+(id, name, type, size, url, tag, uploadDate, patientId, description) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 fileData.id,
                 fileData.name,

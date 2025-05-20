@@ -39,17 +39,30 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
     }
   }
 
-  // Guardar archivo a través de la API
   const saveFileItem = async (file: FileItem): Promise<void> => {
     try {
+      const formData = new FormData()
+      formData.append("file", file.file)
+      formData.append("patientId", file.patientId)
+      if (file.tag) formData.append("tag", file.tag)
+      if (file.description) formData.append("description", file.description)
+
       const response = await fetch('/api/archivos', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(file)
+        body: formData
       })
-      if (!response.ok) throw new Error("Error al guardar archivo")
+      if (!response.ok) {
+        // Lee el mensaje de error del backend
+        let errorMsg = "Error al guardar archivo"
+        try {
+          const errorData = await response.json()
+          errorMsg = errorData?.error || errorMsg
+          console.error("API error:", errorData)
+        } catch (e) {
+          // Si no es JSON, ignora
+        }
+        throw new Error(errorMsg)
+      }
     } catch (error) {
       console.error("Error saving file:", error)
       throw error
@@ -91,7 +104,7 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
   }
 
   // Renombrar archivo a través de la API
-  const renameFileItem = async (fileId: string, newName: string): Promise<void> => {
+  const renameFileItem = async (patientId: string, fileId: string, newName: string): Promise<void> => {
     try {
       const response = await fetch(`/api/archivos`, {
         method: 'PUT',
@@ -165,8 +178,8 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
     try {
       setAllFiles((prev) =>
         prev.map((file) => (file.id === fileId ? { ...file, name: newName } : file))
-      ) // Added missing closing parenthesis here
-      await renameFileItem(fileId, newName)
+      )
+      await renameFileItem(patientId, fileId, newName)
     } catch (error) {
       console.error("Error al renombrar el archivo:", error)
       const files = await loadPatientFiles(patientId)

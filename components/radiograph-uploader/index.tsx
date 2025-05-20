@@ -172,7 +172,6 @@ export function RadiographUploader({
   const handleUploadSubmit = () => {
     if (!uploadFile) return
 
-    // Crear objeto de archivo para la lista
     const newFile: FileItem = {
       id: uuidv4(),
       name: uploadFile.name,
@@ -182,16 +181,14 @@ export function RadiographUploader({
       tag: uploadTag,
       uploadDate: new Date().toISOString(),
       patientId: patientId,
-      description: uploadDescription, // Guardar la descripción
+      description: uploadDescription,
+      file: uploadFile, // <-- ¡ESTO ES CLAVE!
     }
 
-    // Actualizar estado y notificar al componente padre
     setFiles((prev) => [newFile, ...prev])
     setSelectedFile(newFile)
     setPreviewFile({ file: uploadFile, url: uploadPreviewUrl })
-    if (onFileAdded) onFileAdded(newFile)
-
-    // Cerrar modal
+    if (onFileAdded) onFileAdded(newFile) // <-- ¡ESTO ES CLAVE!
     setShowUploadModal(false)
 
     toast({
@@ -381,9 +378,8 @@ export function RadiographUploader({
                     files.map((file) => (
                       <div
                         key={file.id}
-                        className={`border rounded-lg p-3 flex justify-between items-center hover:bg-muted/50 transition-colors cursor-pointer ${
-                          selectedFile?.id === file.id ? "bg-muted/50 border-primary" : ""
-                        }`}
+                        className={`border rounded-lg p-3 flex justify-between items-center hover:bg-muted/50 transition-colors cursor-pointer ${selectedFile?.id === file.id ? "bg-muted/50 border-primary" : ""
+                          }`}
                         onClick={() => handleViewFile(file)}
                       >
                         <div className="flex items-center gap-3 overflow-hidden">
@@ -611,9 +607,8 @@ export function RadiographUploader({
 
             <div
               ref={dropAreaRef}
-              className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                isDragging ? "border-primary bg-primary/5" : "hover:bg-muted/50"
-              }`}
+              className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging ? "border-primary bg-primary/5" : "hover:bg-muted/50"
+                }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}

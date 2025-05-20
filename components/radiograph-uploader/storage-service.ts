@@ -15,10 +15,16 @@ export async function loadPatientFiles(patientId: string) {
 
 // Guardar archivo
 export async function saveFileItem(file: any) {
+  // Cambia el envío de JSON por FormData para soportar archivos binarios
+  const formData = new FormData();
+  formData.append("file", file.file); // file.file debe ser un objeto File real
+  formData.append("patientId", file.patientId);
+  if (file.tag) formData.append("tag", file.tag);
+  if (file.description) formData.append("description", file.description);
+
   const res = await fetch("/api/archivos", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(file),
+    body: formData,
   });
   if (!res.ok) throw new Error("Error al guardar archivo");
   return res.json();
