@@ -81,9 +81,9 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
   }
 
   // Actualizar etiqueta a través de la API
-  const updateFileTag = async (fileId: string, newTag: string): Promise<void> => {
+  const updateFileTag = async (patientId: string, fileId: string, newTag: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/archivos`, {
+      const response = await fetch(`/api/archivos`, {  
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
     try {
       setAllFiles((prev) =>
         prev.map((file) => (file.id === fileId ? { ...file, tag: newTag } : file)))
-      await updateFileTag(fileId, newTag)
+      await updateFileTag(patientId, fileId, newTag) // <-- PASA patientId
     } catch (error) {
       console.error("Error al actualizar la etiqueta:", error)
       const files = await loadPatientFiles(patientId)

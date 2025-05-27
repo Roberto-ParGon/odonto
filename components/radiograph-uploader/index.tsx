@@ -182,13 +182,13 @@ export function RadiographUploader({
       uploadDate: new Date().toISOString(),
       patientId: patientId,
       description: uploadDescription,
-      file: uploadFile, // <-- ¡ESTO ES CLAVE!
+      file: uploadFile,
     }
 
     setFiles((prev) => [newFile, ...prev])
     setSelectedFile(newFile)
     setPreviewFile({ file: uploadFile, url: uploadPreviewUrl })
-    if (onFileAdded) onFileAdded(newFile) // <-- ¡ESTO ES CLAVE!
+    if (onFileAdded) onFileAdded(newFile)
     setShowUploadModal(false)
 
     toast({
