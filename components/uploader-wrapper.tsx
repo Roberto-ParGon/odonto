@@ -83,7 +83,7 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
   // Actualizar etiqueta a través de la API
   const updateFileTag = async (patientId: string, fileId: string, newTag: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/archivos`, {  
+      const response = await fetch(`/api/archivos`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -141,11 +141,13 @@ export function UploaderWrapper({ patientId }: UploaderWrapperProps) {
 
   const handleFileAdded = async (file: FileItem) => {
     try {
-      setAllFiles((prev) => [file, ...prev])
       await saveFileItem(file)
+      // Después de guardar, recarga la lista completa desde la API
+      const files = await loadPatientFiles(patientId)
+      setAllFiles(files)
     } catch (error) {
       console.error("Error al añadir el archivo:", error)
-      setAllFiles((prev) => prev.filter((f) => f.id !== file.id))
+      // No agregues el archivo si falla
     }
   }
 

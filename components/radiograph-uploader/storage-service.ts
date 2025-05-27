@@ -14,20 +14,33 @@ export async function loadPatientFiles(patientId: string) {
 }
 
 // Guardar archivo
-export async function saveFileItem(file: any) {
-  // Cambia el envío de JSON por FormData para soportar archivos binarios
-  const formData = new FormData();
-  formData.append("file", file.file); // file.file debe ser un objeto File real
-  formData.append("patientId", file.patientId);
-  if (file.tag) formData.append("tag", file.tag);
-  if (file.description) formData.append("description", file.description);
+const saveFileItem = async (file: FileItem): Promise<any> => {
+  try {
+    const formData = new FormData()
+    formData.append("file", file.file)
+    formData.append("patientId", file.patientId)
+    if (file.tag) formData.append("tag", file.tag)
+    if (file.description) formData.append("description", file.description)
 
-  const res = await fetch("/api/archivos", {
-    method: "POST",
-    body: formData,
-  });
-  if (!res.ok) throw new Error("Error al guardar archivo");
-  return res.json();
+    const response = await fetch('/api/archivos', {
+      method: 'POST',
+      body: formData
+    })
+    if (!response.ok) {
+      let errorMsg = "Error al guardar archivo"
+      try {
+        const errorData = await response.json()
+        errorMsg = errorData?.error || errorMsg
+        console.error("API error:", errorData)
+      } catch (e) {}
+      throw new Error(errorMsg)
+    }
+    // Devuelve la respuesta del backend (que incluye el file con el id real)
+    return await response.json()
+  } catch (error) {
+    console.error("Error saving file:", error)
+    throw error
+  }
 }
 
 // Eliminar archivo
